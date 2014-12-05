@@ -1,0 +1,73 @@
+# Coursera Practical Machine Learning Project
+
+Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement – a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, your goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. More information is available from the website here: http://groupware.les.inf.puc-rio.br/har (see the section on the Weight Lifting Exercise Dataset).
+
+## Data
+
+The training data for this project are available here: 
+https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv
+The test data are available here: 
+https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv
+
+## Modeling
+
+Load training and test data set using CSV read.
+
+training<-read.csv(training_URL,na.strings=c("NA",""))
+test<-read.csv(test_URL,na.strings=c("NA",""))
+
+In order to provide consistent data to construct features, the first task was to sanitize the data.  The following steps where taken:
+1. Convert empty string to NA value during CSv read.
+
+
+## Feature Selection
+
+With a clean data set, the next task was to explore the data and determine what is likely useful information.  An important goal of any model to generalize well with unseen data.  Given this,
+
+1.  Any features that contained NA values were removed.
+2.  Several columns appeared to be entirely metadata.  These columns were dropped as any correlation that exists would likely be spurious and therefore cause the model to perform poorly.
+
+The following fields removed included:
+
+* `the unlabeled row indexc
+* `user_name`
+* `raw_timestamp_part_1`
+* `raw_timestamp_part_2`
+* `cvtd_timestamp`
+* `new_window`
+* `num_window`
+
+## Cross Validation
+
+Cross validation was achieved by splitting the training data into a test set and a training set using the following:
+
+```{r training}
+InTrain<-createDataPartition(y=training$classe,p=0.6,list=FALSE)
+
+training1<-training[InTrain,]
+test1 <- training[~InTrain,]
+```
+
+The data was partioned by the `classe` variable to ensure the training set and test set contain examples of each class. 60% of the training data was allocated to the training set and the remainder for the validation set.
+
+## Training - Model creation
+
+The random forest model was initially used to prediction.
+
+```{r train, echo=F}
+rf_model<-train(classe~.,data=training1,method="rf",trControl=trainControl(method="cv",number=5),prox=TRUE,allowParallel=TRUE)
+
+print(rf_model)
+print(rf_model$finalModel)
+```
+
+
+## Recall - Prediction
+
+```{r predict}
+predict(rf_model, newdata = test)
+```
+
+## Conclusion
+
+The random forest algorithm appears to perform very well for predicting activities from accelerometers measurements.
