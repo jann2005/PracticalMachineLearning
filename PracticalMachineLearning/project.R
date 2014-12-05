@@ -1,5 +1,4 @@
-# TODO: Add comment
-# 
+#  
 # Author: Hiren Dutta
 ###############################################################################
 
@@ -23,10 +22,8 @@ require(knitr)
 require(randomForest)
 
 # List of URLs 
-training_URL<-"D:/Workspace/git/PracticalMachineLearning/data/pml-training.csv"
-test_URL<-"D:/Workspace/git/PracticalMachineLearning/data/pml-testing.csv"
-model_fileName <- "D:/Workspace/git/PracticalMachineLearning/model/rf_model.rda"
-output_directory <- "D:/Workspace/git/PracticalMachineLearning/output/"
+training_URL<-"https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
+test_URL<-"https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
 
 # Load CSV dataset
 training<-read.csv(training_URL,na.strings=c("NA",""))
@@ -62,11 +59,9 @@ print(rf_model$finalModel)
 pml_write_files  <- function(x) {
 	n = length(x)
 	for(i in 1:n){
-		filename = paste0(output_directory,"problem_id_",i,".txt")
+		filename = paste0("problem_id_",i,".txt")
 		write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
 	}
 }
 
 pml_write_files(predict(rf_model, newdata = test))
-
-knit2html("D:/Workspace/git/PracticalMachineLearning/project.Rmd", "D:/Workspace/git/PracticalMachineLearning/index.html")
